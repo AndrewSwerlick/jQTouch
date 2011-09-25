@@ -728,23 +728,30 @@
             function touchMoveHandler(e) {
                 // _debug();
                 updateChanges();
-                var absX = Math.abs(deltaX);
-                var absY = Math.abs(deltaY);
-                var direction;
-                if (absX > absY && (absX > 35) && deltaT < 1000) {
-                    if (deltaX < 0) {
-                        direction = 'left';
-                    } else {
-                        direction = 'right';
+                if($el.data('events').drag.length > 0)
+                {
+                    $el.trigger('drag', {deltaX:deltaX, deltaY:deltaY});        
+                }
+                else{
+                    var absX = Math.abs(deltaX);
+                    var absY = Math.abs(deltaY);
+                    var direction;
+                    if (absX > absY && (absX > 35) && deltaT < 1000) {
+                        if (deltaX < 0) {
+                            direction = 'left';
+                        } else {
+                            direction = 'right';
+                        }
+                        $el.unbind('touchmove',touchMoveHandler).unbind('touchend',touchEndHandler).unbind('touchcancel',touchCancelHandler);
+                        $el.trigger('swipe', {direction:direction, deltaX:deltaX, deltaY: deltaY});
+                    }                                         
+                    $el.unselect();
+                    clearTimeout(hoverTimeout);
+                    if (absX > jQTSettings.moveThreshold || absY > jQTSettings.moveThreshold) {
+                        clearTimeout(pressTimeout);
                     }
-                    $el.unbind('touchmove',touchMoveHandler).unbind('touchend',touchEndHandler).unbind('touchcancel',touchCancelHandler);
-                    $el.trigger('swipe', {direction:direction, deltaX:deltaX, deltaY: deltaY});
                 }
-                $el.unselect();
-                clearTimeout(hoverTimeout);
-                if (absX > jQTSettings.moveThreshold || absY > jQTSettings.moveThreshold) {
-                    clearTimeout(pressTimeout);
-                }
+            
             }
 
             function updateChanges() {
@@ -815,6 +822,13 @@
                     return $(this).live('swipe', fn);
                 } else {
                     return $(this).trigger('swipe');
+                }
+            }
+            $.fn.drag = function(fn) {
+                if ($.isFunction(fn)) {
+                    return $(this).live('drag', fn);
+                } else {
+                    return $(this).trigger('drag');
                 }
             }
             $.fn.tap = function(fn) {
