@@ -740,6 +740,7 @@
                     $el.unbind('touchmove',touchMoveHandler).unbind('touchend',touchEndHandler).unbind('touchcancel',touchCancelHandler);
                     $el.trigger('swipe', {direction:direction, deltaX:deltaX, deltaY: deltaY});
                 }
+                $el.trigger('drag', {deltaX:deltaX, deltaY: deltaY});
                 $el.unselect();
                 clearTimeout(hoverTimeout);
                 if (absX > jQTSettings.moveThreshold || absY > jQTSettings.moveThreshold) {
@@ -816,6 +817,13 @@
                 } else {
                     return $(this).trigger('swipe');
                 }
+            }
+            $.fn.drag = function(fn) {
+                if ($.isFunction(fn)) {
+                    return $(this).live('drag', fn);
+                } else {
+                    return $(this).trigger('drag');
+                }                         
             }
             $.fn.tap = function(fn) {
                 if ($.isFunction(fn)) {
